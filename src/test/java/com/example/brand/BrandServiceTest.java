@@ -7,7 +7,6 @@ import static org.mockito.Mockito.*;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.Optional;
 
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
@@ -20,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
 import com.example.entity.Brand;
 
@@ -35,11 +33,11 @@ class BrandServiceTest {
     /** モック化したクラス */
     @Mock
     private BrandRepository mockBrandRepository;
-    
+
     /** テスト対象クラスにモックを注入 */
     @InjectMocks
     private BrandService target;
-    
+
     /**
     * テストデータの投入
     */
@@ -74,7 +72,7 @@ class BrandServiceTest {
             }
         }
     }
-    
+
     /**
     * 概要 ブランド名の入力チェック<br>
     * 条件 ブランド名が1文字の場合<br>
@@ -85,7 +83,7 @@ class BrandServiceTest {
         Brand brand = new Brand("あ");
         assertThat(target.isValid(brand)).isTrue();
     }
-    
+
     /**
      * 概要 ブランド名の入力チェック<br>
      * 条件 ブランド名が10文字の場合<br>
@@ -97,8 +95,9 @@ class BrandServiceTest {
 
         /* Lesson02 タスク -初級編- 課題1 */
         // 検証処理
+        assertThat(target.isValid(brand)).isTrue();
     }
-    
+
     /**
     * 概要 ブランド名の重複チェック<br>
     * 条件 ブランド名が重複していない場合<br>
@@ -108,10 +107,10 @@ class BrandServiceTest {
     void ブランド名が重複していない場合trueを返すこと() {
         // ブランド名が重複していないブランド情報を作成
         Brand newBrand = new Brand("あいうえお");
-        
+
         // スタブの設定
         doReturn(null).when(this.mockBrandRepository).findByName(anyString());
-        
+
         /* Lesson02 タスク -初級編- 課題2 */
         // 検証処理
     }
@@ -128,7 +127,7 @@ class BrandServiceTest {
 
         //スタブの設定
         doReturn(null).when(this.mockBrandRepository).countById(id);
-        
+
         /* Lesson02 タスク -初級編- 課題3 */
         // 検証処理
     }
