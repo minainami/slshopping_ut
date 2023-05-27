@@ -19,8 +19,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
 import com.example.entity.Brand;
+
 
 /*
  * @SpringBootTest
@@ -131,5 +133,9 @@ class BrandServiceTest {
 
         /* Lesson02 タスク -初級編- 課題3 */
         // 検証処理
+        assertThatThrownBy(() -> {
+        	target.get(id);
+        })
+        .isInstanceOf(NotFoundException.class);
     }
 }
