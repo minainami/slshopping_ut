@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.util.Optional;
 
 import org.dbunit.database.DatabaseConnection;
 import org.dbunit.database.IDatabaseConnection;
@@ -22,7 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 
 import com.example.entity.Brand;
-
 
 /*
  * @SpringBootTest
@@ -94,10 +94,32 @@ class BrandServiceTest {
     @Test
     void ブランド名が10文字の場合trueを返すこと() {
         Brand brand = new Brand("ああああああああああ");
-
-        /* Lesson02 タスク -初級編- 課題1 */
-        // 検証処理
         assertThat(target.isValid(brand)).isTrue();
+    }
+
+    /**
+    * 概要 ブランド名の入力チェック<br>
+    * 条件 ブランド名が0文字の場合<br>
+    * 結果 falseを返すこと
+    */
+    @Test
+    void ブランド名が0文字の場合falseを返すこと() {
+        Brand brand = new Brand("");
+
+        // ①検証メソッドの誤り
+        //assertThat(target.isValid(brand)).isTrue();
+        assertThat(target.isValid(brand)).isFalse();
+    }
+
+    /**
+    * 概要 ブランド名の入力チェック<br>
+    * 条件 ブランド名が11文字の場合<br>
+    * 結果 falseを返すこと
+    */
+    @Test
+    void ブランド名が11文字の場合falseを返すこと() {
+        Brand brand = new Brand("あああああああああああ");
+        assertThat(target.isValid(brand)).isFalse();
     }
 
     /**
@@ -113,9 +135,54 @@ class BrandServiceTest {
         // スタブの設定
         doReturn(null).when(this.mockBrandRepository).findByName(anyString());
 
-        /* Lesson02 タスク -初級編- 課題2 */
-        // 検証処理
+        // 検証
         assertThat(target.checkUnique(newBrand)).isTrue();
+    }
+
+    /**
+    * 概要 ブランド名の重複チェック<br>
+    * 条件 ブランド名が重複する場合<br>
+    * 結果 falseを返すこと
+    */
+    @Test
+    void ブランド名が重複する場合falseを返すこと() {
+        // 準備 ブランド名が重複するブランド情報を作成
+        Brand newBrand = new Brand("ブランドA");
+
+        // スタブに設定するデータを作成
+        Brand mockBrand = new Brand();
+        mockBrand.setId(1L);
+        mockBrand.setName("ブランドA");
+
+        //スタブの設定
+        doReturn(mockBrand).when(this.mockBrandRepository).findByName(newBrand.getName());
+
+        // 検証
+        assertThat(target.checkUnique(newBrand)).isFalse();
+    }
+
+    /**
+    * 概要 ブランド情報の取得<br>
+    * 条件 指定したブランドIDに対応するブランド情報が存在する場合<br>
+    * 結果 例外が発生しないこと
+    */
+    @Test
+    void ブランド情報が存在する場合例外が発生しないこと() {
+        // 準備 テストデータに存在するID
+        Long id = 1L;
+
+        // スタブに設定するデータを作成
+        Long count = 1L;
+        Optional<Brand> brand = Optional.of(new Brand());
+
+        //スタブの設定
+        doReturn(count).when(this.mockBrandRepository).countById(id);
+        doReturn(brand).when(this.mockBrandRepository).findById(id);
+
+        // 検証
+        assertThatCode(() -> {
+            target.get(id);
+        }).doesNotThrowAnyException();
     }
 
     /**
@@ -131,11 +198,35 @@ class BrandServiceTest {
         //スタブの設定
         doReturn(null).when(this.mockBrandRepository).countById(id);
 
-        /* Lesson02 タスク -初級編- 課題3 */
-        // 検証処理
+        // 検証
         assertThatThrownBy(() -> {
-        	target.get(id);
+            target.get(id);
         })
         .isInstanceOf(NotFoundException.class);
     }
+
+    /**
+    * ブランド情報の取得処理の検証<br>
+    * 条件 空のブランド情報をスタブに設定する<br>
+    * 結果 取得結果がスタブで設定したブランド情報と等しいこと
+    */
+    @Test
+    void ブランド情報の取得処理の検証() throws Exception {
+        // 準備 任意のID
+        Long id = 1L;
+
+        // スタブに設定するデータを作成
+        Long count = 1L;
+        Optional<Brand> brand = Optional.of(new Brand());
+
+        // スタブの設定
+        doReturn(count).when(this.mockBrandRepository).countById(id);
+        doReturn(brand).when(this.mockBrandRepository).findById(id);
+
+        // 検証
+        Brand actual = this.target.get(id);
+        assertThat(actual).isEqualTo(brand.get());
+
+    }
+
 }

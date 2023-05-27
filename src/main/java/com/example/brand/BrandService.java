@@ -49,7 +49,7 @@ public class BrandService {
      *
      * @param id ブランドID
      * @return ブランド情報
-     * @throws NotFoundException 
+     * @throws NotFoundException
      */
     public Brand get(Long id) throws NotFoundException {
         // IDに紐づくブランド情報が存在するかの確認
@@ -78,14 +78,16 @@ public class BrandService {
     public boolean isValid(Brand brand) {
         // 保存したいブランド名の文字数を取得
         int nameLength = brand.getName().length();
-        
+
         // 文字数の判定（1文字から10文字まで）
+        // ②範囲指定の誤り
+        //if (nameLength < 1 || nameLength >= 10) {
         if (nameLength < 1 || nameLength > 10) {
             return false;
         }
         return true;
     }
- 
+
     /**
      * ブランド名の重複チェック
      *
@@ -98,6 +100,8 @@ public class BrandService {
 
         if (isCreatingNew) {
             if (brandByName != null) {
+            	// ③returnする真偽値の誤り
+                //return true;
                 return false;
             }
         } else {
@@ -112,7 +116,7 @@ public class BrandService {
      * IDに紐づくブランド情報削除処理
      *
      * @param id ブランドID
-     * @throws NotFoundException 
+     * @throws NotFoundException
      */
     public void delete(Long id) throws NotFoundException {
         // IDに紐づくブランド情報が存在するかの確認
@@ -130,10 +134,14 @@ public class BrandService {
      */
     private boolean exists(Long id) {
         Long countById = brandRepository.countById(id);
+
+        // ④比較する値の誤り
+        //if (countById == null || countById == 1L) {
+        // 　　　　該当が0個だったら、ということ↓
         if (countById == null || countById == 0L) {
             return false;
         }
         return true;
     }
-    
+
 }
