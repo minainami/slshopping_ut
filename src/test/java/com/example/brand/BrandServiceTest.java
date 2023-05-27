@@ -113,6 +113,7 @@ class BrandServiceTest {
 
         /* Lesson02 タスク -初級編- 課題2 */
         // 検証処理
+        assertThat(target.checkUnique(newBrand)).isTrue();
     }
 
     /**
